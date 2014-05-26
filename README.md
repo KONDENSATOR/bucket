@@ -1,5 +1,5 @@
-bucket-node
------------
+bucket
+------
 
 ### What is it
 
@@ -7,7 +7,7 @@ It is a simple in memory data-storage that persists to simple json-files, featur
 
 ### Warning
 
-This library is still under heavy development and should not be used in production as is.
+This library is under heavy development and should not be used in production as is. I'll let you know when things change.
 
 ### Features
 
@@ -15,6 +15,7 @@ This library is still under heavy development and should not be used in producti
 * Underscore queries
 * Incremental persistance
 * Transactional
+* Chainable
 * Easy
   * To install
   * Use
@@ -26,6 +27,7 @@ This library is still under heavy development and should not be used in producti
   * Fork
   * Merge
 * Data partitioning
+* Reactive (yeah there's a buzz word for you)
 
 ### Quick start
 
@@ -50,8 +52,11 @@ bucket('myfolder')
       .filter((item) -> item.name == "nodejs")
       .log()
       .value()
-    console.dir(result))
+    dosomething(result))
 ```
+
+* log() is a simple inspector that logs the current value to the console
+* value() returns the unwrapped current value
 
 #### Setting and storing
 
@@ -61,11 +66,27 @@ bucket('myfolder')
   .use('master') # master is always default
   .ondata((data) ->
     data.set({id:'myuniqueid', name:'myname', data:'mydata'})
-    data.store()
-    data.onstore((branch) -> "Stored data on branch #{branch.branch()}"))
+      .store()
+      .onstore((branch) -> console.log("Stored data on branch #{branch.branch()}")))
+```
+
+#### Querying, manipulating and storing
+
+```coffeescript
+bucket('myfolder')
+  .onerror((err) -> console.log(err))
+  .use()
+  .ondata((data) ->
+    data.query()
+      .filter((item) -> item.name == "nodejs")
+      .map((item) -> item.other = "coffee")
+      .set()
+      .store()
+      .onstore((branch) -> console.log("Stored data on branch #{branch.branch()}")))
 ```
 
 ### Licence
+
 The MIT License (MIT)
 
 Copyright (c) 2014 Fredrik Andersson, KONDENSATOR

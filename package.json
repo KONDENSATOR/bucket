@@ -1,0 +1,28 @@
+{
+  "name": "bucket",
+  "version": "0.0.1",
+  "description": "Incremental file storage",
+  "main": "index.js",
+  "dependencies": {
+    "underscore": "~1.6.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/KONDENSATOR/bucket.git"
+  },
+  "keywords": [
+    "persistant",
+    "storage",
+    "json"
+  ],
+  "author": "Fredrik Andersson / Kondensator",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/KONDENSATOR/bucket/issues"
+  },
+  "homepage": "https://github.com/KONDENSATOR/bucket"
+}

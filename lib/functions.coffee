@@ -4,6 +4,10 @@ readline = require("readline")
 _        = require("underscore")
 util     = require("util")
 
+inspect = (obj, value) ->
+  console.log(util.inspect(value, colors:true, depth:null))
+  obj
+
 set     = (obj, items) ->
   if items?
     state = obj.state
@@ -14,8 +18,10 @@ set     = (obj, items) ->
         discard(obj)
         state.err("Bucket(#{state.branch}) Transaction rollbacked - Error: Item contains no id: #{util.inspect(item)}")
         return
-      state.dirty[item.id] = item
-      state.changes[item.id] = item)
+      present = state.dirty[item.id]
+      if not _(item).isEqual(present)
+        state.dirty[item.id] = item
+        state.changes[item.id] = item)
   obj
 
 remove = (obj, ids) ->
@@ -31,7 +37,7 @@ filename = (obj) ->
   state = obj.state
   path.join(state.path, state.branch)
 
-load = (obj) ->
+load = (obj, fn) ->
   state = obj.state
   # Create file if not existing
   fs.closeSync(fs.openSync(filename(obj), 'a'))
@@ -50,7 +56,10 @@ load = (obj) ->
   # Callback on EOF passing the bucket with data
   rl.on("close", () =>
     commit(obj)
-    state.data(obj))
+    if fn?
+      fn(obj)
+    else
+      state.data(obj))
 
   # Return the bucket configuration
   obj
@@ -132,6 +141,7 @@ onclosed = (obj, fn) ->
   this
 
 module.exports =
+  inspect  : inspect
   set      : set
   remove   : remove
   filename : filename

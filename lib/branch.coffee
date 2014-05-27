@@ -25,7 +25,7 @@ class Branch
   onstored : (fn) -> f.onstored(@, fn); this
 
   filename : () -> f.filename(@)
-  load : () -> f.load(@)
+  load : (fn) -> f.load(@, fn)
 
   # Obliterate me
   oblit : () -> f.oblit(@)
@@ -45,5 +45,7 @@ class Branch
   set     : (itms) -> f.set(@, itms)
   remove  : (keys) -> f.remove(@, keys)
   store   : () -> f.store(new Branch(@state))
+
+  inspect : () -> f.inspect(@, @state.dirty)
 
 module.exports = Branch

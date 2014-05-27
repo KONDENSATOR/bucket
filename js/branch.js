@@ -46,8 +46,8 @@
       return f.filename(this);
     };
 
-    Branch.prototype.load = function() {
-      return f.load(this);
+    Branch.prototype.load = function(fn) {
+      return f.load(this, fn);
     };
 
     Branch.prototype.oblit = function() {
@@ -92,6 +92,10 @@
 
     Branch.prototype.store = function() {
       return f.store(new Branch(this.state));
+    };
+
+    Branch.prototype.inspect = function() {
+      return f.inspect(this, this.state.dirty);
     };
 
     return Branch;

@@ -1,3 +1,4 @@
+_      = require('underscore')
 Branch = require('./branch')
 
 f = require("./functions")
@@ -26,7 +27,10 @@ class Bucket
   list     : () -> f.list(@)
   close    : () -> f.close(@)
 
-  use : (name) ->
+  use : (name, fn) ->
+    if _(name).isFunction()
+      fn = name
+      name = 'master'
     name ?= 'master'
     branch = new Branch(@state)
     branch.init(name, this)
@@ -37,7 +41,8 @@ class Bucket
       if err?
         @state.err(err)
       else
-        branch.load())
+        branch.load(fn))
+
     branch
 
 module.exports = Bucket

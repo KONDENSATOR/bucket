@@ -18,7 +18,7 @@ This library is NOT ready for production use!
 ### Features
 
 * In memory
-* Underscore queries
+* Underscore subset queries
 * Incremental persistance
 * Transactional
 * Chainable

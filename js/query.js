@@ -21,91 +21,91 @@
     };
 
     Query.prototype.reduce = function(fn, memo) {
-      return exec('reduce', fn, memo);
+      return this.exec('reduce', fn, memo);
     };
 
     Query.prototype.reduceRight = function(fn, memo) {
-      return exec('reduceRight', fn, memo);
+      return this.exec('reduceRight', fn, memo);
     };
 
     Query.prototype.map = function(fn) {
-      return exec('map', fn);
+      return this.exec('map', fn);
     };
 
     Query.prototype.find = function(fn) {
-      return exec('find', fn);
+      return this.exec('find', fn);
     };
 
     Query.prototype.filter = function(fn) {
-      return exec('filter', fn);
+      return this.exec('filter', fn);
     };
 
     Query.prototype.reject = function(fn) {
-      return exec('reject', fn);
+      return this.exec('reject', fn);
     };
 
     Query.prototype.every = function(fn) {
-      return exec('every', fn);
+      return this.exec('every', fn);
     };
 
     Query.prototype.some = function(fn) {
-      return exec('some', fn);
+      return this.exec('some', fn);
     };
 
     Query.prototype.max = function(fn) {
-      return exec('max', fn);
+      return this.exec('max', fn);
     };
 
     Query.prototype.min = function(fn) {
-      return exec('min', fn);
+      return this.exec('min', fn);
     };
 
     Query.prototype.sortBy = function(fn) {
-      return exec('sortBy', fn);
+      return this.exec('sortBy', fn);
     };
 
     Query.prototype.groupBy = function(fn) {
-      return exec('groupBy', fn);
+      return this.exec('groupBy', fn);
     };
 
     Query.prototype.indexBy = function(fn) {
-      return exec('indexBy', fn);
+      return this.exec('indexBy', fn);
     };
 
     Query.prototype.countBy = function(fn) {
-      return exec('countBy', fn);
+      return this.exec('countBy', fn);
     };
 
     Query.prototype.size = function() {
-      return exec('size');
+      return this.exec('size');
     };
 
     Query.prototype.first = function(n) {
-      return exec('first', n);
+      return this.exec('first', n);
     };
 
     Query.prototype.initial = function(n) {
-      return exec('initial', n);
+      return this.exec('initial', n);
     };
 
     Query.prototype.last = function(n) {
-      return exec('last', n);
+      return this.exec('last', n);
     };
 
     Query.prototype.rest = function(n) {
-      return exec('rest', n);
+      return this.exec('rest', n);
     };
 
     Query.prototype.compact = function() {
-      return exec('compact', fn);
+      return this.exec('compact', fn);
     };
 
     Query.prototype.flatten = function(shallow) {
-      return exec('flatten', shallow);
+      return this.exec('flatten', shallow);
     };
 
     Query.prototype.uniq = function(isSorted, fn) {
-      return exec('uniq', isSorted, fn);
+      return this.exec('uniq', isSorted, fn);
     };
 
     Query.prototype.value = function() {

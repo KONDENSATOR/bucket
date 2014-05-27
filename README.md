@@ -5,9 +5,15 @@ bucket
 
 It is a simple in memory data-storage that persists to simple json-files, featuring Underscore.js. This makes it fast and easy. The file format is incremental using append only to write.
 
+### Why?
+
+*My database works just fine!* - Yes, and it's probably safer, better, faster and so forth (at least for now).
+
+However there's always the hassle setting up databases in new environments, be it on a new developer machine, test server or production. With bucket you don't need to worry because all there is, is a folder of files. Heck, you can even keep data in the repository if you like.
+
 ### Warning
 
-This library is under heavy development and should not be used in production as is. I'll let you know when things change.
+This library is NOT ready for production use!
 
 ### Features
 

@@ -39,6 +39,7 @@ filename = (obj) ->
 
 load = (obj, fn) ->
   state = obj.state
+
   # Create file if not existing
   fs.closeSync(fs.openSync(filename(obj), 'a'))
 
@@ -56,10 +57,7 @@ load = (obj, fn) ->
   # Callback on EOF passing the bucket with data
   rl.on("close", () =>
     commit(obj)
-    if fn?
-      fn(obj)
-    else
-      state.data(obj))
+    fn(obj) if fn?)
 
   # Return the bucket configuration
   obj
@@ -94,8 +92,10 @@ discard = (obj) ->
 
 commit  = (obj) ->
   state = obj.state
+  changes = state.changes
   state.commited = _(state.dirty).clone()
   state.changes = {}
+  obj.state.data(obj, changes)
   obj
 
 store   = (obj) ->

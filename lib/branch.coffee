@@ -44,7 +44,7 @@ class Branch
   query   : () -> new Query(@)
   set     : (itms) -> f.set(@, itms)
   remove  : (keys) -> f.remove(@, keys)
-  store   : () -> f.store(new Branch(@state))
+  store   : () -> new Branch(f.store(@state))
 
   inspect : () -> f.inspect(@, @state.dirty)
 

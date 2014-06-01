@@ -38,29 +38,30 @@ filename = (obj) ->
   path.join(state.path, state.branch)
 
 load = (obj, fn) ->
-  state = obj.state
+  do (obj, fn) ->
+    state = obj.state
 
-  # Create file if not existing
-  fs.closeSync(fs.openSync(filename(obj), 'a'))
+    # Create file if not existing
+    fs.closeSync(fs.openSync(filename(obj), 'a'))
 
-  # Set up line reader
-  rl = readline.createInterface(
-    input    : fs.createReadStream(filename(obj))
-    output   : process.stdout
-    terminal : false)
+    # Set up line reader
+    rl = readline.createInterface(
+      input    : fs.createReadStream(filename(obj))
+      output   : process.stdout
+      terminal : false)
 
-  # On each line
-  rl.on("line", (line) =>
-    chunk   = JSON.parse(line)
-    set(obj, chunk))
+    # On each line
+    rl.on("line", (line) =>
+      chunk   = JSON.parse(line)
+      set(obj, chunk))
 
-  # Callback on EOF passing the bucket with data
-  rl.on("close", () =>
-    commit(obj)
-    fn(obj) if fn?)
+    # Callback on EOF passing the bucket with data
+    rl.on("close", () =>
+      commit(obj)
+      fn(obj) if fn?)
 
-  # Return the bucket configuration
-  obj
+    # Return the bucket configuration
+    obj
 
 # Obliterate me
 oblit = (obj) ->
@@ -99,27 +100,29 @@ commit  = (obj) ->
   obj
 
 store   = (obj) ->
-  state = obj.state
-  if changed(obj)
-    transaction = JSON.stringify(_(state.changes).values()) + "\n"
+  do (obj) ->
+    state = obj.state
+    if changed(obj)
+      transaction = JSON.stringify(_(state.changes).values()) + "\n"
 
-    fs.appendFile(filename(obj), transaction, {encoding:'utf8'}, (err) ->
-      if err?
-        discard(obj)
-        state.err("Bucket(#{@state.branch}) Transaction rollbacked - " + err)
-      else
-        state.commited = state.dirty
-        state.changes = {}
-        state.stored(obj))
-  obj
+      fs.appendFile(filename(obj), transaction, {encoding:'utf8'}, (err) ->
+        if err?
+          discard(obj)
+          state.err("Bucket(#{@state.branch}) Transaction rollbacked - " + err)
+        else
+          state.commited = state.dirty
+          state.changes = {}
+          state.stored(obj))
+    obj
 
 ensure = (filepath, fn) ->
-  real = path.resolve(filepath)
-  fs.exists(real, (exists) ->
-    if exists
-      fn()
-    else
-      fn("Path '#{real}' does not exist"))
+  do (filepath, fn) ->
+    real = path.resolve(filepath)
+    fs.exists(real, (exists) ->
+      if exists
+        fn()
+      else
+        fn("Path '#{real}' does not exist"))
 
 onerr  = (obj, fn) ->
   obj.state.err = fn

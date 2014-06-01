@@ -1,7 +1,7 @@
 _      = require('underscore')
-Branch = require('./branch')
 
-f = require("./functions")
+Branch = require('./branch')
+f      = require("./functions")
 
 class Bucket
   constructor: (path) ->
@@ -46,3 +46,5 @@ class Bucket
     branch
 
 module.exports = Bucket
+
+

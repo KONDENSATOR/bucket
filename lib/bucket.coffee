@@ -1,15 +1,18 @@
-_      = require('underscore')
-
+_      = require('lodash')
 Branch = require('./branch')
 f      = require("./functions")
 
+instanceid = 0
+
 class Bucket
   constructor: (path) ->
+    instanceid += 1
     @state =
+      id       : "bucket:#{instanceid}"
       path     : path
       children : {}
       err      : () -> this
-      data     : () -> this
+      read     : () -> this
       stored   : () -> this
 
   # Accessors
@@ -17,7 +20,7 @@ class Bucket
   parent   : () -> @state.parent
 
   onerr    : (fn) -> f.onerr(@, fn); this
-  ondata   : (fn) -> f.ondata(@, fn); this
+  onread   : (fn) -> f.onread(@, fn); this
   onstored : (fn) -> f.onstored(@, fn); this
   onoblited: (fn) -> f.onoblited(@, fn); this
   onlisted : (fn) -> f.onlisted(@, fn); this
@@ -28,12 +31,11 @@ class Bucket
   close    : () -> f.close(@)
 
   use : (name, fn) ->
-    if _(name).isFunction()
+    if _.isFunction(name)
       fn = name
       name = 'master'
     name ?= 'master'
-    branch = new Branch(@state)
-    branch.init(name, this)
+    branch = new Branch(@, name)
 
     @state.children[name] = branch
 
@@ -46,5 +48,4 @@ class Bucket
     branch
 
 module.exports = Bucket
-
 

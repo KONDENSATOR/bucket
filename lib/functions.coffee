@@ -1,43 +1,60 @@
 path     = require("path")
 fs       = require("fs")
 readline = require("readline")
-_        = require("underscore")
+_        = require("lodash")
 util     = require("util")
 
+dlog = (obj, fname) ->
+  # console.log(obj.state.id, fname)
+
+ilog = (obj, fname, info) ->
+  console.log(obj.state.id, fname, info)
+
+
+
 inspect = (obj, value) ->
+  dlog(obj, "inspect")
   console.log(util.inspect(value, colors:true, depth:null))
   obj
 
-set     = (obj, items) ->
+set = (obj, items) ->
+  dlog(obj, "set")
   if items?
     state = obj.state
-    items = [items] if not _(items).isArray()
+    items = [items] if not _.isArray(items)
+    ilog(obj, "set", "Set argument contains #{items.length} items")
 
-    _(items).each((item) ->
+    _.each(items, (item) ->
       if not item.id?
         discard(obj)
         state.err("Bucket(#{state.branch}) Transaction rollbacked - Error: Item contains no id: #{util.inspect(item)}")
         return
-      present = state.dirty[item.id]
-      if not _(item).isEqual(present)
+      present = JSON.stringify(state.dirty[item.id])
+      comparable = JSON.stringify(item)
+
+      if present != comparable
         state.dirty[item.id] = item
-        state.changes[item.id] = item)
+        state.changes[item.id] = item
+    )
   obj
 
 remove = (obj, ids) ->
+  dlog(obj, "remove")
   if ids?
-    ids = [ids] if not _(ids).isArray()
+    ids = [ids] if not _.isArray(ids)
     state = obj.state
-    _(ids).each((id) ->
+    _.each(ids, (id) ->
       delete state.dirty[id]
       state.changes[id] = {id:id, deleted:true})
   obj
 
 filename = (obj) ->
+  dlog(obj, "filename")
   state = obj.state
   path.join(state.path, state.branch)
 
 load = (obj, fn) ->
+  dlog(obj, "load")
   do (obj, fn) ->
     state = obj.state
 
@@ -57,7 +74,10 @@ load = (obj, fn) ->
 
     # Callback on EOF passing the bucket with data
     rl.on("close", () =>
+      changes = obj.state.changes
       commit(obj)
+      obj.state.read(obj, changes)
+      changes = null
       fn(obj) if fn?)
 
     # Return the bucket configuration
@@ -65,54 +85,69 @@ load = (obj, fn) ->
 
 # Obliterate me
 oblit = (obj) ->
+  dlog(obj, "oblit")
   state = obj.state
   obj
 
 # Close me and my children
 close = (obj) ->
+  dlog(obj, "close")
   state = obj.state
   obj
 
 # Fork me
 fork  = (obj, name) ->
+  dlog(obj, "fork")
   state = obj.state
   obj
 
 # Merge with parent unless parent is type Bucket
 merge = (obj) ->
+  dlog(obj, "merge")
   state = obj.state
   obj
 
-changed = (obj) -> _(obj.state.changes).keys().length > 0
+changed = (obj) ->
+  dlog(obj, "changed")
+  _.keys(obj.state.changes).length > 0
 
 discard = (obj) ->
+  dlog(obj, "discard")
   state = obj.state
-  state.dirty = _(state.commited).clone()
+  state.dirty = _.clone(state.commited)
   state.changes = {}
   obj
 
 commit  = (obj) ->
+  dlog(obj, "commit")
   state = obj.state
   changes = state.changes
-  state.commited = _(state.dirty).clone()
+  state.commited = _.clone(state.dirty)
   state.changes = {}
-  obj.state.data(obj, changes)
   obj
 
 store   = (obj) ->
+  dlog(obj, "store")
   do (obj) ->
     state = obj.state
-    if changed(obj)
+    if not changed(obj)
+      ilog(obj, "store", "Nothing changed")
+    else
       transaction = JSON.stringify(_(state.changes).values()) + "\n"
+
+      ilog(obj, "store", "Appending to #{filename(obj)}")
 
       fs.appendFile(filename(obj), transaction, {encoding:'utf8'}, (err) ->
         if err?
           discard(obj)
+          ilog(obj, "store", "Error storing")
           state.err("Bucket(#{@state.branch}) Transaction rollbacked - " + err)
         else
-          state.commited = state.dirty
-          state.changes = {}
-          state.stored(obj))
+          ilog(obj, "store", "Done storing #{state.changes.length} changes")
+          stored_changes = state.changes
+          commit(obj)
+          state.stored(obj, stored_changes)
+          stored_changes = null)
     obj
 
 ensure = (filepath, fn) ->
@@ -125,21 +160,27 @@ ensure = (filepath, fn) ->
         fn("Path '#{real}' does not exist"))
 
 onerr  = (obj, fn) ->
+  dlog(obj, "onerr")
   obj.state.err = fn
   this
-ondata = (obj, fn) ->
-  obj.state.data = fn
+onread = (obj, fn) ->
+  dlog(obj, "onread")
+  obj.state.read = fn
   this
 onstored = (obj, fn) ->
+  dlog(obj, "onstored")
   obj.state.stored = fn
   this
 onoblited = (obj, fn) ->
+  dlog(obj, "onoblited")
   obj.state.oblited = fn
   this
 onlisted = (obj, fn) ->
+  dlog(obj, "onlisted")
   obj.state.listed = fn
   this
 onclosed = (obj, fn) ->
+  dlog(obj, "onclosed")
   obj.state.closed = fn
   this
 
@@ -155,10 +196,10 @@ module.exports =
   merge    : merge
   changed  : changed
   discard  : discard
-  commit   : commit
   store    : store
   ensure   : ensure
 
   onerr    : onerr
-  ondata   : ondata
+  onread   : onread
   onstored : onstored
+

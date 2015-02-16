@@ -1,27 +1,26 @@
-_ = require("underscore")
+_ = require("lodash")
 
 Query = require("./query")
 
 f = require("./functions")
 
+instanceid = 0
 
 class Branch
-  constructor: (state) ->
-    @state = _(state).clone()
-
-  init : (name, parent) ->
+  constructor: (parent, name) ->
+    instanceid += 1
+    @state = _(parent.state).clone()
+    @state.id = "branch:#{instanceid}"
     @state.branch   = name
     @state.parent   = parent
-
     @state.children = {}
     @state.commited = {}  # Keeps commited state
     @state.dirty    = {}  # Keeps whole data in dirty state
     @state.changes  = {}  # Keeps only changed datagrams
-    this
 
-  branch : () -> @state.branch
-  onerr  : (fn) -> f.onerr(@, fn); this
-  ondata : (fn) -> f.ondata(@, fn); this
+  branch   : () -> @state.branch
+  onerr    : (fn) -> f.onerr(@, fn); this
+  onread   : (fn) -> f.onread(@, fn); this
   onstored : (fn) -> f.onstored(@, fn); this
 
   filename : () -> f.filename(@)
@@ -40,11 +39,10 @@ class Branch
   merge   : () -> f.merge(@)
   changed : () -> f.changed(@)
   discard : () -> f.discard(@)
-  commit  : () -> f.commit(@)
   query   : () -> new Query(@)
   set     : (itms) -> f.set(@, itms)
   remove  : (keys) -> f.remove(@, keys)
-  store   : () -> new Branch(f.store(@state))
+  store   : () -> f.store(@)
 
   inspect : () -> f.inspect(@, @state.dirty)
 

@@ -50,7 +50,7 @@ bucket = require("bucket-node")
 #### Querying
 
 ```coffeescript
-the_result_of_dosomething = bucket('myfolder')
+bucket('myfolder')
   .onerror((err) -> console.log(err))
   .use((data) ->
     result = data.query()

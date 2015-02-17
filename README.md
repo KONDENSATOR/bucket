@@ -25,7 +25,7 @@ This library is NOT ready for production use!
 * Easy
   * To install
   * Use
-  * Distribute
+  * Deploy
 
 ### Future features
 
@@ -50,10 +50,9 @@ bucket = require("bucket-node")
 #### Querying
 
 ```coffeescript
-bucket('myfolder')
+the_result_of_dosomething = bucket('myfolder')
   .onerror((err) -> console.log(err))
-  .use()
-  .ondata((data) ->
+  .use((data) ->
     result = data.query()
       .filter((item) -> item.name == "nodejs")
       .log()
@@ -69,8 +68,7 @@ bucket('myfolder')
 ```coffeescript
 bucket('myfolder')
   .onerror((err) -> console.log(err))
-  .use('master') # master is always default
-  .ondata((data) ->
+  .use('master', (data) -> # master is always default
     data.set({id:'myuniqueid', name:'myname', data:'mydata'})
       .store()
       .onstore((branch) -> console.log("Stored data on branch #{branch.branch()}")))
@@ -81,8 +79,7 @@ bucket('myfolder')
 ```coffeescript
 bucket('myfolder')
   .onerror((err) -> console.log(err))
-  .use()
-  .ondata((data) ->
+  .use((data) ->
     data.query()
       .filter((item) -> item.name == "nodejs")
       .map((item) -> item.other = "coffee")
